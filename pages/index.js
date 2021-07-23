@@ -1,5 +1,7 @@
 import Head from 'next/head'
-
+import Image from 'next/image'
+import contentPic from '/public/images/willow-flycatcher.jpeg'
+import stylePic from '/public/images/wing-bg.jpeg'
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -8,17 +10,24 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex-col  justify-center w-full flex-1 text-left">
+      <main className="flex-col  justify-center w-full flex-1 text-left overflow-auto">
         <div class="text-center text-xl py-6 font-bold border-b border-solid">
           Style Transfer Configurator
         </div>
-        <div class="flex justify-center">
-          <div class="w-full">
-            <div class="text-xl pb-3">Content Image</div>
-            
-          </div>
-          <div class="w-full">
-            <div class="text-xl pt-4">Style Image</div>
+        <div class="flex justify-center p-10">
+          <div class="w-full text-center">
+            <div>
+              <div class="text-xl pb-3">Content Image</div>
+              <Image src={contentPic} />
+            </div>
+            <div class="w-full">
+              <div class="text-xl pt-4">Style Image</div>
+              <Image src={stylePic} />
+            </div>
+            <div class="w-full">
+              <div class="text-xl pt-4">Computed Image</div>
+              <Image src={stylePic} />
+            </div>
           </div>
         </div>
       </main>
