@@ -5,18 +5,20 @@ import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
-export default function Select({ label = '', options }) {
-  const [selected, setSelected] = useState(options[0])
-
+export default function Select({ label = '', options, value, onChange }) {
+  const handleOnChange = (v) => {
+    if (onChange) onChange(v)
+  }
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={value} onChange={handleOnChange}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium text-gray-700 text-left ml-2">{label}</Listbox.Label>
           <div className="mt-1 relative">
             <Listbox.Button className="relative w-full bg-primary-light border border-primary rounded-md shadow-sm pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm">
               <span className="flex items-center">
-                <span className="ml-3 block truncate">{selected.label}</span>
+                <span className="ml-3 block truncate">{value.label}</span>
+                <span className="ml-3 text-gray-500 text-sm truncate">{value.sublabel}</span>
               </span>
               <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                 <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -43,16 +45,18 @@ export default function Select({ label = '', options }) {
                         'cursor-default select-none relative py-2 pl-3 pr-9'
                       )
                     }
-                    value={option.label}
+                    value={option}
                   >
                     {({ selected, active }) => (
                       <>
-                        <div className="flex">
+                        <div className="flex items-center">
                           <span
                             className={classNames(selected ? 'font-semibold' : 'font-normal', 'ml-3 block truncate')}
                           >
                             {option.label}
                           </span>
+                          <span className="ml-3 text-gray-500 text-sm truncate">{option.sublabel}</span>
+
                         </div>
 
                         {selected ? (

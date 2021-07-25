@@ -11,7 +11,7 @@ export default function Layout({ children }) {
      
       <header className="fixed z-10 bg-primary text-center w-full"><Navbar/></header>
       <main className="flex flex-col h-screen relative bg-accent">
-        <div className="absolute top-20 h-ful">
+        <div className="absolute top-20 h-full w-full">
           {children}
         </div>
       </main>

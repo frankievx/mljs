@@ -5,39 +5,47 @@ import { useRouter } from 'next/router'
 import contentImg from '/public/images/willow-flycatcher.jpeg'
 import styleImg from '/public/images/wing-bg.jpeg'
 import Select from '/components/Select'
-let mobileStyleNet, separableTransformNet;
+let mobileStyleNet, inceptionStyleNet, originalTransformNet, separableTransformNet;
 
 
 const styleModelOptions = [
-  { label: 'Distilled MobileNet', sublabel: 'Performance' },
-  { label: 'Inception v3', sublabel: 'Quality' }
+  { id: 1, label: 'Distilled MobileNet', sublabel: 'Performance' },
+  { id: 2, label: 'Inception v3', sublabel: 'Quality' }
 ]
 
 const transformModelOptions = [
-  { label: 'Separable Conv2D', sublabel: 'Performance' },
-  { label: 'Original', sublabel: 'Quality' }
+  { id: 1, label: 'Separable Conv2D', sublabel: 'Performance' },
+  { id: 2, label: 'Original', sublabel: 'Quality' }
 ]
+
+const initModels = async () => {
+  if (!mobileStyleNet)
+    mobileStyleNet = await tf.loadGraphModel('saved_model_style_js/model.json');
+  if (!inceptionStyleNet) 
+    inceptionStyleNet = await tf.loadGraphModel('saved_model_style_inception_js/model.json');
+  if (!separableTransformNet) 
+    separableTransformNet = await tf.loadGraphModel('saved_model_transformer_separable_js/model.json');
+  if (!originalTransformNet)
+    originalTransformNet = await tf.loadGraphModel('saved_model_transformer_js/model.json'); 
+}
 
 export default function StyleTransfer() {
   let styleEl, contentEl;
   let [styleRatio, setStyleRatio] = useState(1)
   let [styleNet, setStyleNet] = useState(null)
   let [transformNet, setTransformNet] = useState(null)
+  let [selectedStyleNet, setSelectedStyleNet] = useState(styleModelOptions[0])
+  let [selectedTransformNet, setSelectedTransformNet] = useState(transformModelOptions[0])
+
   const stylizedRef = useRef()
 
-  useEffect(async () => {
-    if (!mobileStyleNet) {
-      mobileStyleNet = await tf.loadGraphModel('saved_model_style_js/model.json');
-    }
-    if (!separableTransformNet) {
-      separableTransformNet = await tf.loadGraphModel(
-        'saved_model_transformer_separable_js/model.json'
-      );
-    }
-
-    styleNet = mobileStyleNet
-    transformNet = separableTransformNet
-  })
+  const setModels = () => {
+    console.log('selected', selectedStyleNet, selectedTransformNet)
+    if (selectedStyleNet.id === 1) setStyleNet(mobileStyleNet)
+    if (selectedStyleNet.id === 2) setStyleNet(inceptionStyleNet)
+    if (selectedTransformNet.id === 1) setTransformNet(separableTransformNet)
+    if (selectedTransformNet.id === 2) setTransformNet(originalTransformNet)
+  }
 
   const handleClick = async () => {
     await tf.nextFrame();
@@ -50,19 +58,23 @@ export default function StyleTransfer() {
     await tf.browser.toPixels(stylized, stylizedRef.current);
     bottleneck.dispose();  // Might wanna keep this around
     stylized.dispose();
+    console.log('done ')
     // await tf.nextFrame();
 
   }
 
   const contentImgLoaded = (e) => {
     contentEl = document.getElementById('contentImg')
-    console.log('element', contentEl);
   }
 
   const styleImgLoaded = (e) => {
     styleEl = document.getElementById('styleImg')
-    console.log('element', styleEl);
   }
+
+  useEffect(async () => {
+    initModels()
+    setModels()
+  }, [selectedStyleNet, selectedTransformNet])
 
 
   return (
@@ -78,9 +90,11 @@ export default function StyleTransfer() {
         </div>
         <div className="w-full">
           <div className="text-xl pt-4">Computed Image</div>
-          <Select label="Style Model" options={styleModelOptions}/>
-          <div className="mt-4"><Select label="Transformer Model" options={transformModelOptions}/></div>
-          <canvas ref={stylizedRef}></canvas>
+          <Select label="Style Model" options={styleModelOptions} value={selectedStyleNet} onChange={setSelectedStyleNet}/>
+          <div className="mt-4">
+            <Select label="Transformer Model" options={transformModelOptions} value={selectedTransformNet} onChange={setSelectedTransformNet}/>
+          </div>
+          <canvas className="mt-4" ref={stylizedRef}></canvas>
         </div>
       </div>
       <div className="w-full text-center ">
@@ -88,7 +102,7 @@ export default function StyleTransfer() {
           className="px-6 py-2 mt-2 bg-primary text-black rounded"
           onClick={handleClick}
         >
-          Train
+          Transfer Style
         </button>
       </div>
     </div>
