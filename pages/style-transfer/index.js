@@ -4,9 +4,19 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import contentImg from '/public/images/willow-flycatcher.jpeg'
 import styleImg from '/public/images/wing-bg.jpeg'
-
+import Select from '/components/Select'
 let mobileStyleNet, separableTransformNet;
 
+
+const styleModelOptions = [
+  { label: 'Distilled MobileNet', sublabel: 'Performance' },
+  { label: 'Inception v3', sublabel: 'Quality' }
+]
+
+const transformModelOptions = [
+  { label: 'Separable Conv2D', sublabel: 'Performance' },
+  { label: 'Original', sublabel: 'Quality' }
+]
 
 export default function StyleTransfer() {
   let styleEl, contentEl;
@@ -27,7 +37,6 @@ export default function StyleTransfer() {
 
     styleNet = mobileStyleNet
     transformNet = separableTransformNet
-    console.log('stylizedRef', stylizedRef);
   })
 
   const handleClick = async () => {
@@ -57,24 +66,26 @@ export default function StyleTransfer() {
 
 
   return (
-    <div className="w-screen pb-4">
+    <div className="w-screen pb-4 bg-accent">
       <div className="w-full text-center px-2">
         <div>
           <div className="text-xl pb-3">Content Image</div>
           <Image id="contentImg" src={contentImg} onLoadingComplete={contentImgLoaded}/>
         </div>
         <div className="w-full">
-          <div className="text-xl pt-4">Style Image</div>
+          <div className="text-xl pt-4 ">Style Image</div>
           <Image id="styleImg" src={styleImg} onLoadingComplete={styleImgLoaded}/>
         </div>
         <div className="w-full">
           <div className="text-xl pt-4">Computed Image</div>
+          <Select label="Style Model" options={styleModelOptions}/>
+          <div className="mt-4"><Select label="Transformer Model" options={transformModelOptions}/></div>
           <canvas ref={stylizedRef}></canvas>
         </div>
       </div>
-      <div className="w-full text-center">
+      <div className="w-full text-center ">
         <button 
-          className="px-6 py-2 mt-2 bg-green-600 text-white rounded"
+          className="px-6 py-2 mt-2 bg-primary text-black rounded"
           onClick={handleClick}
         >
           Train

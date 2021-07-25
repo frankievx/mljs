@@ -9,9 +9,9 @@ export default function Layout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
      
-      <header className="fixed z-10 bg-white text-center w-full"><Navbar/></header>
-      <main className="flex flex-col h-screen relative">
-        <div className="absolute top-20 h-full">
+      <header className="fixed z-10 bg-primary text-center w-full"><Navbar/></header>
+      <main className="flex flex-col h-screen relative bg-accent">
+        <div className="absolute top-20 h-ful">
           {children}
         </div>
       </main>

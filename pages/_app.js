@@ -1,5 +1,5 @@
 import 'tailwindcss/tailwind.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/tailwind.css'
 import Layout from '/layouts/main.jsx'
 
 function MyApp({ Component, pageProps }) {
