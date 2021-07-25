@@ -72,32 +72,36 @@ export default function StyleTransfer() {
   }
 
   useEffect(async () => {
-    initModels()
+    await initModels()
     setModels()
   }, [selectedStyleNet, selectedTransformNet])
 
 
   return (
-    <div className="w-screen pb-4 bg-accent">
-      <div className="w-full text-center px-2">
+    <div className="w-full pb-4 bg-accent">
+      <div className="w-full text-center px-2 max-w-md mx-auto">
         <div>
           <div className="text-xl pb-3">Content Image</div>
-          <Image id="contentImg" src={contentImg} onLoadingComplete={contentImgLoaded}/>
+          <Image id="contentImg" layout="intrinsic" src={contentImg} onLoadingComplete={contentImgLoaded}/>
         </div>
         <div className="w-full">
           <div className="text-xl pt-4 ">Style Image</div>
-          <Image id="styleImg" src={styleImg} onLoadingComplete={styleImgLoaded}/>
+          <Image id="styleImg" layout="intrinsic" width="300" height="300" src={styleImg} onLoadingComplete={styleImgLoaded}/>
         </div>
-        <div className="w-full">
+        <div className="w-full mx-auto">
           <div className="text-xl pt-4">Computed Image</div>
-          <Select label="Style Model" options={styleModelOptions} value={selectedStyleNet} onChange={setSelectedStyleNet}/>
-          <div className="mt-4">
-            <Select label="Transformer Model" options={transformModelOptions} value={selectedTransformNet} onChange={setSelectedTransformNet}/>
+          <div className=" mx-auto">
+            <div className="w-full">
+              <Select label="Style Model" options={styleModelOptions} value={selectedStyleNet} onChange={setSelectedStyleNet}/>
+            </div>
+            <div className="mt-4 w-full">
+              <Select label="Transformer Model" options={transformModelOptions} value={selectedTransformNet} onChange={setSelectedTransformNet}/>
+            </div>
           </div>
-          <canvas className="mt-4" ref={stylizedRef}></canvas>
+          <canvas className="mt-4 mx-auto" ref={stylizedRef}></canvas>
         </div>
       </div>
-      <div className="w-full text-center ">
+      <div className="w-full text-center">
         <button 
           className="px-6 py-2 mt-2 bg-primary text-black rounded"
           onClick={handleClick}
