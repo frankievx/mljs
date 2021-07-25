@@ -18,20 +18,12 @@ const transformModelOptions = [
   { id: 2, label: 'Original', sublabel: 'Quality' }
 ]
 
-const initModels = async () => {
-  if (!mobileStyleNet)
-    mobileStyleNet = await tf.loadGraphModel('saved_model_style_js/model.json');
-  if (!inceptionStyleNet) 
-    inceptionStyleNet = await tf.loadGraphModel('saved_model_style_inception_js/model.json');
-  if (!separableTransformNet) 
-    separableTransformNet = await tf.loadGraphModel('saved_model_transformer_separable_js/model.json');
-  if (!originalTransformNet)
-    originalTransformNet = await tf.loadGraphModel('saved_model_transformer_js/model.json'); 
-}
+
 
 export default function StyleTransfer() {
   let styleEl, contentEl;
   let [styleRatio, setStyleRatio] = useState(1)
+  let [loading, setLoading] = useState(true)
   let [styleNet, setStyleNet] = useState(null)
   let [transformNet, setTransformNet] = useState(null)
   let [selectedStyleNet, setSelectedStyleNet] = useState(styleModelOptions[0])
@@ -39,8 +31,18 @@ export default function StyleTransfer() {
 
   const stylizedRef = useRef()
 
+  const initModels = async () => {
+    if (!mobileStyleNet && selectedStyleNet.id === 1)
+      mobileStyleNet = await tf.loadGraphModel('saved_model_style_js/model.json');
+    if (!inceptionStyleNet && selectedStyleNet.id === 2) 
+      inceptionStyleNet = await tf.loadGraphModel('saved_model_style_inception_js/model.json');
+    if (!separableTransformNet && selectedTransformNet.id === 1) 
+      separableTransformNet = await tf.loadGraphModel('saved_model_transformer_separable_js/model.json');
+    if (!originalTransformNet && selectedTransformNet.id === 2)
+      originalTransformNet = await tf.loadGraphModel('saved_model_transformer_js/model.json'); 
+  }
+
   const setModels = () => {
-    console.log('selected', selectedStyleNet, selectedTransformNet)
     if (selectedStyleNet.id === 1) setStyleNet(mobileStyleNet)
     if (selectedStyleNet.id === 2) setStyleNet(inceptionStyleNet)
     if (selectedTransformNet.id === 1) setTransformNet(separableTransformNet)
@@ -48,7 +50,7 @@ export default function StyleTransfer() {
   }
 
   const handleClick = async () => {
-    await tf.nextFrame();
+    setLoading(true)
     let bottleneck = await tf.tidy(() => {
       return styleNet.predict(tf.browser.fromPixels(styleEl).toFloat().div(tf.scalar(255)).expandDims());
     })
@@ -59,6 +61,7 @@ export default function StyleTransfer() {
     bottleneck.dispose();  // Might wanna keep this around
     stylized.dispose();
     console.log('done ')
+    setLoading(false)
     // await tf.nextFrame();
 
   }
@@ -72,8 +75,10 @@ export default function StyleTransfer() {
   }
 
   useEffect(async () => {
+    setLoading(true)
     await initModels()
     setModels()
+    setLoading(false)
   }, [selectedStyleNet, selectedTransformNet])
 
 
@@ -102,12 +107,12 @@ export default function StyleTransfer() {
         </div>
       </div>
       <div className="w-full text-center">
-        <button 
-          className="px-6 py-2 mt-2 bg-primary text-black rounded"
-          onClick={handleClick}
-        >
-          Transfer Style
-        </button>
+        {
+          loading ? 'Loading...' : <button 
+            className="px-6 py-2 mt-2 bg-primary text-black rounded"
+            onClick={handleClick}
+          >Transfer Style</button>
+        }
       </div>
     </div>
   )
