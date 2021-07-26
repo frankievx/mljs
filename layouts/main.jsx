@@ -10,8 +10,8 @@ export default function Layout({ children }) {
       </Head>
       
       <header className="fixed z-10 bg-primary text-center w-full"><Navbar/></header>
-      <main className="flex flex-col relative bg-accent container mx-auto">
-        <div className="mt-20 h-full w-full">
+      <main className="flex flex-col relative bg-accent container mx-auto h-screen">
+        <div className="mt-20 w-full h-screen bg-accent">
           {children}
         </div>
       </main>
