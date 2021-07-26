@@ -117,10 +117,10 @@ export default function StyleTransfer() {
               <Select label="Transformer Model" options={transformModelOptions} value={selectedTransformNet} onChange={setSelectedTransformNet}/>
             </div>
           </div>
-          <canvas className="mt-4" ref={stylizedRef}></canvas>
+          <canvas className="mt-4 mx-auto" ref={stylizedRef}></canvas>
         </div>
       </div>
-      <div className="w-full text-center">
+      <div className="w-full text-center mb-12">
         {
           loading ? 'Loading...' : <button 
             className="px-6 py-2 mt-2 bg-primary text-black rounded"
