@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import contentImg from '/public/images/willow-flycatcher.jpeg'
 import styleImg from '/public/images/wing-bg.jpeg'
 import Select from '/components/Select'
+import FileUpload from '../../components/FileUpload';
 let mobileStyleNet, inceptionStyleNet, originalTransformNet, separableTransformNet;
 
 
@@ -22,7 +23,9 @@ const transformModelOptions = [
 
 export default function StyleTransfer() {
   let styleEl, contentEl;
-  let [styleRatio, setStyleRatio] = useState(1)
+  let [contentImgSrc, setContentImgSrc] = useState(contentImg.src)
+  let [styleImgSrc, setStyleImgSrc] = useState(styleImg.src)
+  let [styleRatio, setStyleRatio] = useState(0.5)
   let [loading, setLoading] = useState(true)
   let [styleNet, setStyleNet] = useState(null)
   let [transformNet, setTransformNet] = useState(null)
@@ -51,6 +54,8 @@ export default function StyleTransfer() {
 
   const handleClick = async () => {
     setLoading(true)
+    contentImgLoaded()
+    styleImgLoaded()
     let bottleneck = await tf.tidy(() => {
       return styleNet.predict(tf.browser.fromPixels(styleEl).toFloat().div(tf.scalar(255)).expandDims());
     })
@@ -60,9 +65,7 @@ export default function StyleTransfer() {
     await tf.browser.toPixels(stylized, stylizedRef.current);
     bottleneck.dispose();  // Might wanna keep this around
     stylized.dispose();
-    console.log('done ')
     setLoading(false)
-    // await tf.nextFrame();
 
   }
 
@@ -74,6 +77,14 @@ export default function StyleTransfer() {
     styleEl = document.getElementById('styleImg')
   }
 
+  const handleContentImgUpload = (e) => {
+    setContentImgSrc(e.target.result)
+  }
+
+  const handleStyleImgUpload = (e) => {
+    setStyleImgSrc(e.target.result)
+  }
+
   useEffect(async () => {
     setLoading(true)
     await initModels()
@@ -81,17 +92,20 @@ export default function StyleTransfer() {
     setLoading(false)
   }, [selectedStyleNet, selectedTransformNet])
 
+  
 
   return (
     <div className="w-full pb-4 bg-accent">
       <div className="w-full text-center px-2 max-w-md mx-auto">
         <div>
           <div className="text-xl pb-3">Content Image</div>
-          <Image id="contentImg" layout="intrinsic" src={contentImg} onLoadingComplete={contentImgLoaded}/>
+          <div className="mb-4"><FileUpload id="contentUpload"onUpload={handleContentImgUpload} /></div>
+          <img id="contentImg" layout="intrinsic" src={contentImgSrc}/>
         </div>
         <div className="w-full">
-          <div className="text-xl pt-4 ">Style Image</div>
-          <Image id="styleImg" layout="intrinsic" width="300" height="300" src={styleImg} onLoadingComplete={styleImgLoaded}/>
+          <div className="text-xl pt-4 pb-3">Style Image</div>
+          <div className="mb-4"><FileUpload id="styleUpload" onUpload={handleStyleImgUpload} /></div>
+          <img id="styleImg" layout="intrinsic" width="300" height="300" src={styleImgSrc}/>
         </div>
         <div className="w-full mx-auto">
           <div className="text-xl pt-4">Computed Image</div>

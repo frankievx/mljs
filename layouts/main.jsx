@@ -5,7 +5,7 @@ export default function Layout({ children }) {
   return (
     <div className="bg-accent">
       <Head>
-        <title>Style Transfer Configurator</title>
+        <title>Style Transfer Lab</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
