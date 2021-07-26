@@ -97,17 +97,17 @@ export default function StyleTransfer() {
   return (
     <div className="w-full pb-4 bg-accent">
       <div className="w-full text-center px-2 max-w-md mx-auto">
-        <div>
-          <div className="text-xl pb-3">Content Image</div>
+        <div className=" border-b border-solid">
+          <div className="text-xl pb-2 font-bold mb-4">Content Image</div>
           <div className="mb-4"><FileUpload id="contentUpload"onUpload={handleContentImgUpload} /></div>
           <img id="contentImg" layout="intrinsic" src={contentImgSrc}/>
         </div>
-        <div className="w-full">
-          <div className="text-xl pt-4 pb-3">Style Image</div>
-          <div className="mb-4"><FileUpload id="styleUpload" onUpload={handleStyleImgUpload} /></div>
-          <img id="styleImg" layout="intrinsic" width="300" height="300" src={styleImgSrc}/>
+        <div className="w-full mt-8 mb-4">
+          <div className="text-xl pb-2 font-bold border-b border-solid">Style Image</div>
+          <div className="mb-4 mt-4"><FileUpload id="styleUpload" onUpload={handleStyleImgUpload} /></div>
+          <img class="mx-auto" id="styleImg" layout="intrinsic" width="300" height="300" src={styleImgSrc}/>
         </div>
-        <div className="w-full mx-auto">
+        <div className="w-full mx-auto text-center mt-8 mb-4 pb-2 font-bold">
           <div className="text-xl pt-4">Computed Image</div>
           <div className=" mx-auto">
             <div className="w-full">
@@ -117,7 +117,7 @@ export default function StyleTransfer() {
               <Select label="Transformer Model" options={transformModelOptions} value={selectedTransformNet} onChange={setSelectedTransformNet}/>
             </div>
           </div>
-          <canvas className="mt-4 mx-auto" ref={stylizedRef}></canvas>
+          <canvas className="mt-4" ref={stylizedRef}></canvas>
         </div>
       </div>
       <div className="w-full text-center">
