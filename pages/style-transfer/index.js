@@ -1,11 +1,10 @@
-import Image from 'next/image'
 import * as tf from '@tensorflow/tfjs';
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
 import contentImg from '/public/images/willow-flycatcher.jpeg'
 import styleImg from '/public/images/wing-bg.jpeg'
-import Select from '/components/Select'
-import FileUpload from '../../components/FileUpload';
+import ContentImageStep from '../../components/style-transfer/ContentImageStep';
+import StyleImageStep from '../../components/style-transfer/StyleImageStep';
+import TransferStep from '../../components/style-transfer/TransferStep';
 let mobileStyleNet, inceptionStyleNet, originalTransformNet, separableTransformNet;
 
 
@@ -23,6 +22,7 @@ const transformModelOptions = [
 
 export default function StyleTransfer() {
   let styleEl, contentEl;
+  let [step, setStep] = useState('content')
   let [contentImgSrc, setContentImgSrc] = useState(contentImg.src)
   let [styleImgSrc, setStyleImgSrc] = useState(styleImg.src)
   let [styleRatio, setStyleRatio] = useState(0.5)
@@ -93,40 +93,26 @@ export default function StyleTransfer() {
   }, [selectedStyleNet, selectedTransformNet])
 
   
-
+  const transferProps = {
+    selectedStyleNet,
+    selectedTransformNet,
+    setSelectedStyleNet,
+    setSelectedTransformNet,
+    styleModelOptions,
+    transformModelOptions,
+    handleClick
+  }
   return (
-    <div className="w-full pb-4 bg-accent">
-      <div className="w-full text-center px-2 max-w-md mx-auto">
-        <div className=" border-b border-solid">
-          <div className="text-xl pb-2 font-bold mb-4">Content Image</div>
-          <div className="mb-4"><FileUpload id="contentUpload"onUpload={handleContentImgUpload} /></div>
-          <img id="contentImg" layout="intrinsic" src={contentImgSrc}/>
-        </div>
-        <div className="w-full mt-8 mb-4">
-          <div className="text-xl pb-2 font-bold border-b border-solid">Style Image</div>
-          <div className="mb-4 mt-4"><FileUpload id="styleUpload" onUpload={handleStyleImgUpload} /></div>
-          <img class="mx-auto" id="styleImg" layout="intrinsic" width="300" height="300" src={styleImgSrc}/>
-        </div>
-        <div className="w-full mx-auto text-center mt-8 mb-4 pb-2 font-bold">
-          <div className="text-xl pt-4">Computed Image</div>
-          <div className=" mx-auto">
-            <div className="w-full">
-              <Select label="Style Model" options={styleModelOptions} value={selectedStyleNet} onChange={setSelectedStyleNet}/>
-            </div>
-            <div className="mt-4 w-full">
-              <Select label="Transformer Model" options={transformModelOptions} value={selectedTransformNet} onChange={setSelectedTransformNet}/>
-            </div>
-          </div>
-          <canvas className="mt-4 mx-auto" ref={stylizedRef}></canvas>
-        </div>
-      </div>
-      <div className="w-full text-center mb-12">
+    <div className="w-full pt-2 pb-4">
+      <div className="w-full ">
+      {
         {
-          loading ? 'Loading...' : <button 
-            className="px-6 py-2 mt-2 bg-primary text-black rounded"
-            onClick={handleClick}
-          >Transfer Style</button>
-        }
+          'content': <ContentImageStep onUpload={handleContentImgUpload} imgSrc={contentImgSrc} />,
+          'style': <StyleImageStep onUpload={handleStyleImgUpload} imgSrc={styleImgSrc} />,
+          'transfer':<TransferStep {...transferProps} />
+
+        }[step]
+      }
       </div>
     </div>
   )

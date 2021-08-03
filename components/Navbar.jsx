@@ -1,8 +1,10 @@
 
+import { Home } from 'react-feather';
+
 export default function Navbar () {
   return (
-    <div className="font-serif text-center text-xl py-4 border-b border-solid bg-secondary z-10">
-      Style Transfer Lab
+    <div className="font-sans flex justify-between text-xl mx-auto py-4 container">
+      <div className="text-base flex items-center"><Home /></div>
     </div>
   )   
 }

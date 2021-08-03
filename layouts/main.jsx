@@ -3,17 +3,15 @@ import Navbar from '/components/Navbar'
 
 export default function Layout({ children }) {
   return (
-    <div className="bg-accent">
+    <div className="bg-light">
       <Head>
         <title>Style Transfer Lab</title>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="/uppy/uppy.min.css" />
       </Head>
-      
-      <header className="fixed z-10 bg-primary text-center w-full"><Navbar/></header>
-      <main className="flex flex-col relative bg-accent container mx-auto h-screen">
-        <div className="mt-20 w-full h-screen bg-accent">
-          {children}
-        </div>
+      <Navbar />
+      <main className="flex flex-col container mx-auto h-screen max-h-screen">
+        {children}
       </main>
     </div>
   )
