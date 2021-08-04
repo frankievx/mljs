@@ -38,10 +38,11 @@ function CTAButton({ currentStepIndex, onClick }) {
 
 
 export default function StyleTransfer() {
-  let styleEl, contentEl, stepIndex = 0;
   let [step, setStep] = useState('content')
   let [currentStepIndex, setCurrentStepIndex] = useState(0)
   let [contentImgSrc, setContentImgSrc] = useState(contentImg.src)
+  let [contentEl, setContentEl] = useState(null)
+  let [styleEl, setStyleEl] = useState(null)
   let [styleImgSrc, setStyleImgSrc] = useState(styleImg.src)
   let [styleRatio, setStyleRatio] = useState(0.5)
   let [loading, setLoading] = useState(true)
@@ -50,7 +51,9 @@ export default function StyleTransfer() {
   let [selectedStyleNet, setSelectedStyleNet] = useState(styleModelOptions[0])
   let [selectedTransformNet, setSelectedTransformNet] = useState(transformModelOptions[0])
 
-  const stylizedRef = useRef()
+  const stylizedRef = useRef(null)
+  const styleImgRef = useRef(null)
+  const contentImgRef = useRef(null)
 
   const initModels = async () => {
     if (!mobileStyleNet && selectedStyleNet.id === 1)
@@ -84,22 +87,27 @@ export default function StyleTransfer() {
     const stylized = await tf.tidy(() => {
       return transformNet.predict([tf.browser.fromPixels(contentEl).toFloat().div(tf.scalar(255)).expandDims(), bottleneck]).squeeze();
     })
-    await tf.browser.toPixels(stylized, stylizedRef.current);
+    const newSize = [300, 200]
+    const resizedStylized = tf.image.resizeNearestNeighbor(stylized, newSize, true)
+    await tf.browser.toPixels(resizedStylized, stylizedRef.current);
+    console.log('stylizedRef', stylizedRef)
     bottleneck.dispose();  // Might wanna keep this around
     stylized.dispose();
     setLoading(false)
   }
 
   const contentImgLoaded = (e) => {
-    contentEl = document.getElementById('contentImg')
+    console.log('content imgage ref', contentImgRef)
   }
 
   const styleImgLoaded = (e) => {
-    styleEl = document.getElementById('styleImg')
+    console.log('style imgage ref', styleImgRef)
   }
 
   const handleContentImgUpload = (e) => {
+    console.log('e', e);
     setContentImgSrc(e.target.result)
+
   }
 
   const handleStyleImgUpload = (e) => {
@@ -111,6 +119,8 @@ export default function StyleTransfer() {
   }
 
   useEffect(() => {
+    if (styleImgRef.current) setStyleEl(styleImgRef.current)
+    if (contentImgRef.current) setContentEl(contentImgRef.current)
     setCurrentStepIndex(steps.findIndex(item=> item.step === step))
   }, [step])
 
@@ -151,8 +161,8 @@ export default function StyleTransfer() {
       <div className="w-full mt-8">
       {
         {
-          'content': <ContentImageStep onUpload={handleContentImgUpload} imgSrc={contentImgSrc} />,
-          'style': <StyleImageStep onUpload={handleStyleImgUpload} imgSrc={styleImgSrc} />,
+          'content': <ContentImageStep onUpload={handleContentImgUpload} imgSrc={contentImgSrc} ref={contentImgRef}/>,
+          'style': <StyleImageStep onUpload={handleStyleImgUpload} imgSrc={styleImgSrc} ref={styleImgRef}/>,
           'transfer':<TransferStep {...transferProps} />
 
         }[step]

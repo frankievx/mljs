@@ -22,15 +22,15 @@ export default function TransferStep(props) {
 					/>
 				</div>
 			</div>
-			<canvas className="mt-4 mx-auto" ref={props.stylizedRef}></canvas>
-      <div className="w-full text-center mb-12">
+			<canvas className="mt-4 max-w-screen-sm" ref={props.stylizedRef} width="100"></canvas>
+      {/* <div className="w-full text-center mb-12">
         {
           props.loading ? 'Loading...' : <button 
             className="px-6 py-2 mt-2 bg-primary text-black rounded"
             onClick={props.handleClick}
           >Transfer Style</button>
         }
-      </div>
+      </div> */}
 		</div>
 	);
 }
