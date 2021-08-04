@@ -1,10 +1,13 @@
 import * as tf from '@tensorflow/tfjs';
+import _ from 'lodash'
 import { useState, useEffect, useRef } from 'react'
 import contentImg from '/public/images/willow-flycatcher.jpeg'
 import styleImg from '/public/images/wing-bg.jpeg'
-import ContentImageStep from '../../components/style-transfer/ContentImageStep';
-import StyleImageStep from '../../components/style-transfer/StyleImageStep';
-import TransferStep from '../../components/style-transfer/TransferStep';
+import ContentImageStep from '/components/style-transfer/ContentImageStep';
+import StyleImageStep from '/components/style-transfer/StyleImageStep';
+import TransferStep from '/components/style-transfer/TransferStep';
+import Icon from '/components/Icon'
+import Button from '/components/Button'
 let mobileStyleNet, inceptionStyleNet, originalTransformNet, separableTransformNet;
 
 
@@ -18,11 +21,26 @@ const transformModelOptions = [
   { id: 2, label: 'Original', sublabel: 'Quality' }
 ]
 
+const steps = [
+  { step: 'content', icon: 'Image' },
+  { step: 'style', icon: 'PenTool' },
+  { step: 'transfer', icon: 'Coffee' }
+]
+
+function CTAButton({ currentStepIndex, onClick }) {
+  const label = currentStepIndex <= 1 ? 'Next' : 'Transfer Style'
+  return (<div className="absolute bottom-4 w-full text-center">
+    <Button label={label} onClick={() => onClick()}></Button>
+  </div>)
+}
+
+
 
 
 export default function StyleTransfer() {
-  let styleEl, contentEl;
+  let styleEl, contentEl, stepIndex = 0;
   let [step, setStep] = useState('content')
+  let [currentStepIndex, setCurrentStepIndex] = useState(0)
   let [contentImgSrc, setContentImgSrc] = useState(contentImg.src)
   let [styleImgSrc, setStyleImgSrc] = useState(styleImg.src)
   let [styleRatio, setStyleRatio] = useState(0.5)
@@ -53,9 +71,13 @@ export default function StyleTransfer() {
   }
 
   const handleClick = async () => {
+    if (currentStepIndex <= 1) return setStep(steps[currentStepIndex+1].step)
+
     setLoading(true)
+    await tf.nextFrame();
     contentImgLoaded()
     styleImgLoaded()
+    await tf.nextFrame();
     let bottleneck = await tf.tidy(() => {
       return styleNet.predict(tf.browser.fromPixels(styleEl).toFloat().div(tf.scalar(255)).expandDims());
     })
@@ -66,7 +88,6 @@ export default function StyleTransfer() {
     bottleneck.dispose();  // Might wanna keep this around
     stylized.dispose();
     setLoading(false)
-
   }
 
   const contentImgLoaded = (e) => {
@@ -85,6 +106,14 @@ export default function StyleTransfer() {
     setStyleImgSrc(e.target.result)
   }
 
+  const isDisabled = (step) => {
+    if (step === 'style') return 
+  }
+
+  useEffect(() => {
+    setCurrentStepIndex(steps.findIndex(item=> item.step === step))
+  }, [step])
+
   useEffect(async () => {
     setLoading(true)
     await initModels()
@@ -94,6 +123,8 @@ export default function StyleTransfer() {
 
   
   const transferProps = {
+    loading,
+    stylizedRef,
     selectedStyleNet,
     selectedTransformNet,
     setSelectedStyleNet,
@@ -103,8 +134,21 @@ export default function StyleTransfer() {
     handleClick
   }
   return (
-    <div className="w-full pt-2 pb-4">
-      <div className="w-full ">
+    <div className="w-full h-full pt-2 pb-4 relative">
+      <div className="flex justify-between text-sm">
+        {steps.map((item) => {
+          const isActive = step === item.step
+          const rootClass = 'cursor-pointer'
+          const stepClass = isActive ? `text-primary ${rootClass}`  : rootClass
+          return (
+            <div key={item.step} className={stepClass} onClick={() => setStep(item.step)}>
+              <div className="flex justify-center"><Icon icon={item.icon}/></div>
+              <div className="flex justify-center mt-1">{_.capitalize(item.step)}</div>
+            </div>
+          )
+        })}
+      </div>
+      <div className="w-full mt-8">
       {
         {
           'content': <ContentImageStep onUpload={handleContentImgUpload} imgSrc={contentImgSrc} />,
@@ -114,6 +158,7 @@ export default function StyleTransfer() {
         }[step]
       }
       </div>
+      <CTAButton currentStepIndex={currentStepIndex} onClick={handleClick}/>
     </div>
   )
 }

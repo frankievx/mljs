@@ -4,11 +4,12 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     container: {
+      center: true,
       padding: {
         DEFAULT: '1rem',
-        sm: '15rem',
+        sm: '10rem',
         lg: '15rem',
-        xl: '15rem',
+        xl: '20rem',
         '2xl': '15rem',
       },
     },

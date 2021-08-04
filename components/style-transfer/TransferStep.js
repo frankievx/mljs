@@ -25,9 +25,9 @@ export default function TransferStep(props) {
 			<canvas className="mt-4 mx-auto" ref={props.stylizedRef}></canvas>
       <div className="w-full text-center mb-12">
         {
-          loading ? 'Loading...' : <button 
+          props.loading ? 'Loading...' : <button 
             className="px-6 py-2 mt-2 bg-primary text-black rounded"
-            onClick={handleClick}
+            onClick={props.handleClick}
           >Transfer Style</button>
         }
       </div>
