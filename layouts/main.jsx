@@ -9,7 +9,7 @@ export default function Layout({ children }) {
         <link rel="icon" href="/favicon.ico" />
         <link rel="stylesheet" href="/uppy/uppy.min.css" />
       </Head>
-      <main className="flex flex-col container  h-screen max-w-screen-lg">
+      <main className="flex flex-col container min-h-screen max-w-screen-lg">
         <div className="flex"><Navbar /></div>
         {children}
       </main>
