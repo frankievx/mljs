@@ -9,7 +9,7 @@ export default function FileUpload({ id, onUpload }) {
   const uppy = new Uppy({
     id,
     pretty: true,
-    restrictions: { maxNumberOfFiles: 1 },
+    restrictions: { maxNumberOfFiles: 1, maxFileSize: 500000 },
   })
 
 
@@ -37,6 +37,7 @@ export default function FileUpload({ id, onUpload }) {
     } catch (err) {
       if (err.isRestriction) {
         // handle restrictions
+        alert("File size must be less than 500kb.")
         console.log('Restriction error:', err)
       } else {
         // handle other errors
