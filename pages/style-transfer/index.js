@@ -10,6 +10,8 @@ import Icon from '/components/Icon'
 import FileUpload from '/components/FileUpload';
 import Button from '/components/Button'
 import Select from '/components/Select'
+import CircleLoader from "react-spinners/CircleLoader";
+
 let mobileStyleNet, inceptionStyleNet, originalTransformNet, separableTransformNet;
 
 
@@ -166,7 +168,8 @@ export default function StyleTransfer() {
       <div className="w-full mt-8 mb-4 pb-2 font-bold">
         <div className="mb-2 text-xl pb-1 font-bold mb-4 border-b border-solid border-primary">Transfer Style</div>
         <div className="w-full text-center pb-4">
-          <Button label='Transfer Style' onClick={() => handleClick()}></Button>
+          {loading ? <div><CircleLoader color="#f28482" size="30px" /></div> : <Button label='Transfer Style' onClick={() => handleClick()}></Button>}
+        
         </div>
         <div className="">
           <div className="w-full">
