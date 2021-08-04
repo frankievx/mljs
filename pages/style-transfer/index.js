@@ -94,11 +94,11 @@ export default function StyleTransfer() {
   }
 
   const contentImgLoaded = (e) => {
-    console.log('content imgage ref', contentImgRef)
+    // console.log('content imgage ref', contentImgRef)
   }
 
   const styleImgLoaded = (e) => {
-    console.log('style imgage ref', styleImgRef)
+    // console.log('style imgage ref', styleImgRef)
   }
 
   const handleContentImgUpload = (e) => {
@@ -155,7 +155,7 @@ export default function StyleTransfer() {
         </div>
       </div>
       <div className="w-full pb-4 mt-8">
-        <div className="w-full px-2 max-w-md mx-auto">
+        <div className="w-full mx-auto">
           <div className="">
             <div className="text-xl pb-1 font-bold mb-4 border-b border-solid border-primary">Style Image</div>
             <img id="styleImg" src={styleImgSrc}  ref={styleImgRef}/>
