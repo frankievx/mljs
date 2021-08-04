@@ -1,6 +1,11 @@
 module.exports = {
   mode: 'core',
-  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  purge: [
+    './pages/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './layouts/**/*.{js,ts,jsx,tsx}',
+    // Add more here
+  ],
   darkMode: false, // or 'media' or 'class'
   theme: {
     container: {
