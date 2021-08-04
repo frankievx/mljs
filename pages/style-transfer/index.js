@@ -7,7 +7,9 @@ import ContentImageStep from '/components/style-transfer/ContentImageStep';
 import StyleImageStep from '/components/style-transfer/StyleImageStep';
 import TransferStep from '/components/style-transfer/TransferStep';
 import Icon from '/components/Icon'
+import FileUpload from '/components/FileUpload';
 import Button from '/components/Button'
+import Select from '/components/Select'
 let mobileStyleNet, inceptionStyleNet, originalTransformNet, separableTransformNet;
 
 
@@ -74,8 +76,6 @@ export default function StyleTransfer() {
   }
 
   const handleClick = async () => {
-    if (currentStepIndex <= 1) return setStep(steps[currentStepIndex+1].step)
-
     setLoading(true)
     await tf.nextFrame();
     contentImgLoaded()
@@ -87,10 +87,7 @@ export default function StyleTransfer() {
     const stylized = await tf.tidy(() => {
       return transformNet.predict([tf.browser.fromPixels(contentEl).toFloat().div(tf.scalar(255)).expandDims(), bottleneck]).squeeze();
     })
-    const newSize = [300, 200]
-    const resizedStylized = tf.image.resizeNearestNeighbor(stylized, newSize, true)
-    await tf.browser.toPixels(resizedStylized, stylizedRef.current);
-    console.log('stylizedRef', stylizedRef)
+    await tf.browser.toPixels(stylized, stylizedRef.current);
     bottleneck.dispose();  // Might wanna keep this around
     stylized.dispose();
     setLoading(false)
@@ -146,29 +143,50 @@ export default function StyleTransfer() {
   return (
     <div className="w-full h-full pt-2 pb-4 relative">
       <div className="flex justify-between text-sm">
-        {steps.map((item) => {
-          const isActive = step === item.step
-          const rootClass = 'cursor-pointer'
-          const stepClass = isActive ? `text-primary ${rootClass}`  : rootClass
-          return (
-            <div key={item.step} className={stepClass} onClick={() => setStep(item.step)}>
-              <div className="flex justify-center"><Icon icon={item.icon}/></div>
-              <div className="flex justify-center mt-1">{_.capitalize(item.step)}</div>
+        <div className="w-full pb-4">
+          <div className="w-full mx-auto">
+            <div className="">
+              <div className="text-xl pb-1 font-bold mb-4 border-b border-solid border-primary">Content Image</div>
+              <img id="contentImg" src={contentImgSrc} ref={contentImgRef}/>
+              <div className="mt-4"><FileUpload id="contentUpload" onUpload={handleContentImgUpload} /></div>
             </div>
-          )
-        })}
+          </div>
+        </div>
       </div>
-      <div className="w-full mt-8">
-      {
-        {
-          'content': <ContentImageStep onUpload={handleContentImgUpload} imgSrc={contentImgSrc} ref={contentImgRef}/>,
-          'style': <StyleImageStep onUpload={handleStyleImgUpload} imgSrc={styleImgSrc} ref={styleImgRef}/>,
-          'transfer':<TransferStep {...transferProps} />
-
-        }[step]
-      }
+      <div className="w-full pb-4 mt-8">
+        <div className="w-full px-2 max-w-md mx-auto">
+          <div className="">
+            <div className="text-xl pb-1 font-bold mb-4 border-b border-solid border-primary">Style Image</div>
+            <img id="styleImg" src={styleImgSrc}  ref={styleImgRef}/>
+            <div className="mt-4"><FileUpload id="styleUpload" onUpload={handleStyleImgUpload} /></div>
+          </div>
+        </div>
       </div>
-      <CTAButton currentStepIndex={currentStepIndex} onClick={handleClick}/>
+      <div className="w-full mt-8 mb-4 pb-2 font-bold">
+        <div className="mb-2 text-xl pb-1 font-bold mb-4 border-b border-solid border-primary">Transfer Style</div>
+        <div className="w-full text-center pb-4">
+          <Button label='Transfer Style' onClick={() => handleClick()}></Button>
+        </div>
+        <div className="">
+          <div className="w-full">
+            <Select
+              label="Style Model"
+              options={styleModelOptions}
+              value={selectedStyleNet}
+              onChange={setSelectedStyleNet}
+            />
+          </div>
+          <div className="mt-4 w-full">
+            <Select
+              label="Transformer Model"
+              options={transformModelOptions}
+              value={selectedTransformNet}
+              onChange={setSelectedTransformNet}
+            />
+          </div>
+        </div>
+        <canvas className="mt-4" ref={stylizedRef} ></canvas>
+        </div>
     </div>
   )
 }
