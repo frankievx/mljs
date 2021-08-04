@@ -108,6 +108,7 @@ export default function StyleTransfer() {
   }
 
   const handleStyleImgUpload = (e) => {
+    console.log('e', e);
     setStyleImgSrc(e.target.result)
   }
 
