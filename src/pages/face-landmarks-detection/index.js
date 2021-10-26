@@ -34,7 +34,37 @@ export default function FaceLandmarksDetection() {
 	const [predictIrises, setPredictIrises] = useState(true);
 	const [renderPointcloud, setRenderPointCloud] = useState(true);
 
-	const setupDatGui = () => {
+  console.log('test')
+	useEffect(async () => {
+		await tf.setBackend(backend);
+		setupDatGui();
+		await setupCamera();
+    renderVideo()
+		renderCanvas()
+    renderPointCloud()
+	}, []);
+
+	return (
+		<div className="text-center">
+			<div ref={canvasContainer} className="inline-block align-top text-center w-full">
+				<canvas ref={canvas}></canvas>
+				<video
+					ref={video}
+					playsInline
+					style={{
+						"-webkit-transform": "scaleX(-1)",
+						transform: "scaleX(-1)",
+						visibility: "hidden",
+						width: "auto",
+						height: "auto",
+					}}
+				></video>
+			</div>
+      <div ref={scatterGLContainer} className="mt-6 w-full"></div>
+		</div>
+	);
+
+  function setupDatGui() {
 		const dat = require("dat.gui");
 		const gui = new dat.GUI();
 		gui.add({ backend }, "backend", ["webgl"]);
@@ -43,7 +73,7 @@ export default function FaceLandmarksDetection() {
 		gui.add({ predictIrises }, "predictIrises");
 	};
 
-	const setupCamera = async () => {
+  async function setupCamera() {
 		// video = document.getElementById("video");
 		const stream = await window.navigator.mediaDevices.getUserMedia({
 			audio: false,
@@ -64,15 +94,33 @@ export default function FaceLandmarksDetection() {
 		});
 	};
 
-	const setupCanvas = () => {
+  async function renderCanvas() {
 		canvas.current.width = videoWidth;
 		canvas.current.height = videoHeight;
-		const canvasContainer = document.querySelector(".canvas-wrapper");
-		canvasContainer.style = `width: ${videoWidth}px; height: ${videoHeight}px`;
+		canvasContainer.current.style = `width: ${videoWidth}px; height: ${videoHeight}px`;
+
+    ctx = canvas.current.getContext("2d");
+		ctx.translate(canvas.current.width, 0);
+		ctx.scale(-1, 1);
+		ctx.fillStyle = GREEN;
+		ctx.strokeStyle = GREEN;
+		ctx.lineWidth = 0.5;
+		model = await faceLandmarksDetection.load(
+			faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+			{ maxFaces }
+		);
+		renderPrediction();
 	};
 
-	async function renderPrediction() {
-    console.log('testing')
+  function renderVideo() {
+    video.current.play();
+		videoWidth = video.current.videoWidth;
+		videoHeight = video.current.videoHeight;
+		video.current.width = videoWidth;
+		video.current.height = videoHeight;
+  }
+
+  async function renderPrediction() {
 		if (stopRendering) {
 			return;
 		}
@@ -209,33 +257,7 @@ export default function FaceLandmarksDetection() {
 		rafID = requestAnimationFrame(renderPrediction);
 	}
 
-	useEffect(async () => {
-		await tf.setBackend(backend);
-		setupDatGui();
-		await setupCamera();
-		video.current.play();
-		videoWidth = video.current.videoWidth;
-		videoHeight = video.current.videoHeight;
-		video.current.width = videoWidth;
-		video.current.height = videoHeight;
-
-		canvas.current.width = videoWidth;
-		canvas.current.height = videoHeight;
-		canvasContainer.current.style = `width: ${videoWidth}px; height: ${videoHeight}px`;
-
-		ctx = canvas.current.getContext("2d");
-		ctx.translate(canvas.current.width, 0);
-		ctx.scale(-1, 1);
-		ctx.fillStyle = GREEN;
-		ctx.strokeStyle = GREEN;
-		ctx.lineWidth = 0.5;
-    console.log('test')
-		model = await faceLandmarksDetection.load(
-			faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
-			{ maxFaces }
-		);
-		renderPrediction();
-
+  function renderPointCloud () {
     if (renderPointcloud) {
       scatterGLContainer.current.style =
           `width: ${VIDEO_SIZE}px; height: ${VIDEO_SIZE}px;`;
@@ -243,26 +265,7 @@ export default function FaceLandmarksDetection() {
       scatterGL = new ScatterGL(
           scatterGLContainer.current,
           {'rotateOnStart': false, 'selectEnabled': false});
+      setRenderPointCloud(false)
     }
-	}, []);
-
-	return (
-		<div className="text-center">
-			<div ref={canvasContainer} className="inline-block align-top text-center w-full">
-				<canvas ref={canvas}></canvas>
-				<video
-					ref={video}
-					playsInline
-					style={{
-						"-webkit-transform": "scaleX(-1)",
-						transform: "scaleX(-1)",
-						visibility: "hidden",
-						width: "auto",
-						height: "auto",
-					}}
-				></video>
-			</div>
-      <div ref={scatterGLContainer} className="mt-6 w-full"></div>
-		</div>
-	);
+  }
 }
