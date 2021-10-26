@@ -67,7 +67,7 @@ export default function BodyPix() {
 		await loadBodyPix();
 		await loadVideo(guiState.camera);
 
-		let cameras = await getVideoInputs();
+		// let cameras = await getVideoInputs();
 
 		// setupFPS();
 		// setupGui(cameras);
@@ -185,43 +185,6 @@ export default function BodyPix() {
       if (!canvas.current) return
       if (!videoElement.current) return
 			switch (guiState.estimate) {
-				case "segmentation":
-					const multiPersonSegmentation = await estimateSegmentation();
-					switch (guiState.segmentation.effect) {
-						case "mask":
-							const ctx = canvas.current.getContext("2d");
-							const foregroundColor = { r: 255, g: 255, b: 255, a: 255 };
-							const backgroundColor = { r: 0, g: 0, b: 0, a: 255 };
-							const mask = bodyPix.toMask(
-								multiPersonSegmentation,
-								foregroundColor,
-								backgroundColor,
-								true
-							);
-              
-							bodyPix.drawMask(
-								canvas.current,
-								videoElement.current,
-								mask,
-								guiState.segmentation.opacity,
-								guiState.segmentation.maskBlurAmount,
-								flipHorizontally
-							);
-							drawPoses(multiPersonSegmentation, flipHorizontally, ctx);
-							break;
-						case "bokeh":
-							bodyPix.drawBokehEffect(
-								canvas.current,
-								videoElement.current,
-								multiPersonSegmentation,
-								guiState.segmentation.backgroundBlurAmount,
-								guiState.segmentation.edgeBlurAmount,
-								flipHorizontally
-							);
-							break;
-					}
-
-					break;
 				case "partmap":
 					const ctx = canvas.current.getContext("2d");
 					const multiPersonPartSegmentation = await estimatePartSegmentation();
@@ -229,7 +192,6 @@ export default function BodyPix() {
 						multiPersonPartSegmentation,
 						partColorScales[guiState.partMap.colorScale]
 					);
-
 					const maskBlurAmount = 0;
 					switch (guiState.partMap.effect) {
 						case "pixelation":
