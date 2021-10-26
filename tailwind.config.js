@@ -1,9 +1,9 @@
 module.exports = {
-  mode: 'core',
+  mode: 'jit',
   purge: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
-    './layouts/**/*.{js,ts,jsx,tsx}',
+    './src/pages/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
+    './src/layouts/**/*.{js,ts,jsx,tsx}',
     // Add more here
   ],
   darkMode: false, // or 'media' or 'class'
@@ -41,10 +41,5 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require('tailwind-css-variables')(
-      {
-        colors: "color"
-      }
-    )
   ],
 }
