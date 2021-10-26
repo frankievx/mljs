@@ -40,5 +40,11 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-css-variables')(
+      {
+        colors: "color"
+      }
+    )
+  ],
 }
