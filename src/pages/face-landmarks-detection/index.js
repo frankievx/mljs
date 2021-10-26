@@ -11,7 +11,6 @@ export default function FaceLandmarksDetection() {
 		ctx,
 		videoWidth,
 		videoHeight,
-    stopRendering = false,
 		scatterGLHasInitialized = false,
 		scatterGL,
     stats,
@@ -28,13 +27,13 @@ export default function FaceLandmarksDetection() {
 	const canvasContainer = useRef();
   const scatterGLContainer = useRef();
 
+  const [stopRendering, setStopRendering] = useState(false)
 	const [backend, setBackend] = useState("webgl");
 	const [maxFaces, setMaxFaces] = useState(1);
 	const [triangulateMesh, setTriangulateMesh] = useState(true);
 	const [predictIrises, setPredictIrises] = useState(true);
 	const [renderPointcloud, setRenderPointCloud] = useState(true);
 
-  console.log('test')
 	useEffect(async () => {
 		await tf.setBackend(backend);
 		setupDatGui();
@@ -42,6 +41,10 @@ export default function FaceLandmarksDetection() {
     renderVideo()
 		renderCanvas()
     renderPointCloud()
+    return () => {
+      rafId = null
+      setStopRendering(true)
+    }
 	}, []);
 
 	return (
@@ -121,18 +124,18 @@ export default function FaceLandmarksDetection() {
   }
 
   async function renderPrediction() {
-		if (stopRendering) {
-			return;
-		}
+		if (stopRendering) return
+    if (!video.current) return
+
     stats = new Stats()
 		stats.begin();
 		const predictions = await model.estimateFaces({
-			input: video.current,
+			input: video?.current,
 			returnTensors: false,
 			flipHorizontal: false,
 			predictIrises,
 		});
-		ctx.drawImage(
+		if (video.current) ctx.drawImage(
 			video.current,
 			0,
 			0,
