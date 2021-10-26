@@ -214,7 +214,7 @@ export default function BodyPix() {
 								canvas.current,
 								videoElement.current,
 								multiPersonSegmentation,
-								+guiState.segmentation.backgroundBlurAmount,
+								guiState.segmentation.backgroundBlurAmount,
 								guiState.segmentation.edgeBlurAmount,
 								flipHorizontally
 							);
